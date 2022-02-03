@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+{{- if ne .Values.whisk.ingress.type "OpenShift" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -47,7 +48,6 @@ spec:
       {{- end }}
 
       volumes:
-      {{- if or (eq .Values.whisk.ingress.type "NodePort") (eq .Values.whisk.ingress.type "LoadBalancer") }}
       {{- if .Values.nginx.certificate.external }}
       - name: nginx-certs
         configMap:
@@ -56,7 +56,6 @@ spec:
       - name: nginx-certs
         secret:
           secretName: {{ .Release.Name }}-nginx
-      {{- end }}
       {{- end }}
       - name: nginx-conf
         configMap:
@@ -74,15 +73,14 @@ spec:
         ports:
         - name: http
           containerPort: {{ .Values.nginx.httpPort }}
-        - name: https
+        - name: http-api
           containerPort: {{ .Values.nginx.httpsPort }}
         volumeMounts:
         - name: nginx-conf
           mountPath: "/etc/nginx/nginx.conf"
           subPath: "nginx.conf"
-        {{- if or (eq .Values.whisk.ingress.type "NodePort") (eq .Values.whisk.ingress.type "LoadBalancer") }}
         - name: nginx-certs
           mountPath: "/etc/nginx/certs"
-        {{- end }}
         - name: logs
           mountPath: "/logs"
+{{- end }}

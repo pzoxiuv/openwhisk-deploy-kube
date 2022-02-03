@@ -52,7 +52,7 @@ until $ACTION_LIST_PASSED; do
 done
 
 # next invoke the new hello world action via the CLI
-echo "Invoking action via CLI"
+echo "Inoking action via CLI"
 RESULT=$(wsk -i action invoke --blocking hello | grep "\"status\": \"success\"")
 if [ -z "$RESULT" ]; then
   echo "FAILED! Could not invoke hello action via CLI"
@@ -62,9 +62,6 @@ fi
 # now run it as a web action
 echo "Invoking as web action"
 HELLO_URL=$(wsk -i action get hello --url | grep "https://")
-if [ -z "$HELLO_URL" ]; then
-    HELLO_URL=$(wsk -i action get hello --url | grep "http://")
-fi
 RESULT=$(wget --no-check-certificate -qO- $HELLO_URL | grep 'Hello world')
 if [ -z "$RESULT" ]; then
   echo "FAILED! Could not invoke hello as a web action"
@@ -76,16 +73,13 @@ echo "Registering as an api"
 wsk -i api create /demo /hello get hello || (echo "FAILED: unable to create API"; exit 1)
 echo "Invoking action via the api"
 API_URL=$(wsk -i api list | grep hello | awk '{print $4}')
-echo "External api URL: $API_URL"
-INTERNAL_URL=$(echo $API_URL | sed s#^http.*/api/#$WSK_API_HOST_URL/api/#)
-echo "Internal api URL: $INTERNAL_URL"
-RESULT=$(wget --no-check-certificate -qO- "$INTERNAL_URL" | grep 'Hello world')
+RESULT=$(wget --no-check-certificate -qO- "$API_URL" | grep 'Hello world')
 if [ -z "$RESULT" ]; then
   echo "FAILED! Could not invoke hello via apigateway"
   exit 1
 fi
 
-# now delete the resources so the test could be run again
+# now delete the resouces so the test could be run again
 wsk -i api delete /demo || (echo "FAILED! failed to delete API"; exit 1)
 wsk -i action delete hello || (echo "FAILED! failed to delete action"; exit 1)
 

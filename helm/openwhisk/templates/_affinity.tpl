@@ -61,7 +61,7 @@ nodeAffinity:
 {{- end -}}
 
 
-{{/* Generic provider affinity */}}
+{{/* Generic provder affinity */}}
 {{- define "openwhisk.affinity.provider" -}}
 # prefer to not run on an invoker node (only prefer because of single node clusters)
 nodeAffinity:

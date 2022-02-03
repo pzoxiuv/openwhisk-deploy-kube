@@ -26,6 +26,7 @@
 #   docs/k8s-docker-for-mac.md
 #   docs/k8s-aws.md
 #   docs/k8s-ibm-public.md
+#   docs/k8s-ibm-private.md
 #   docs/k8s-google.md
 #   docs/k8s-diy.md (for do-it-yourself clusters).
 #
@@ -47,6 +48,7 @@ whisk:
   # See the "Configuring OpenWhisk section" of the docs/k8s-*.md that matches
   # your cluster type for details on what values to provide and how to get them.
   ingress:
+    awsSSL: "false"
     apiHostName: ""
     apiHostPort: 31001
     apiHostProto: "https"
@@ -54,10 +56,9 @@ whisk:
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     domain: "domain"
-    awsSSL: "false"
-    useInternally: false
     tls:
       enabled: false
+      secretenabled: false
       createsecret: false
       secretname: "ow-ingress-tls-secret"
       secrettype: "type"
@@ -128,15 +129,15 @@ whisk:
     includeSystemTests: false
   versions:
     openwhisk:
-      buildDate: "2021-08-17-05:51:11Z"
-      buildNo: "20210817a"
-      gitTag: "3e6138d088fbd502a69c31314ad7c0089c5f5283"
+      buildDate: "2020-10-20-01:00:00Z"
+      buildNo: "v1.0.0:20201020a"
+      gitTag: "1.0.0"
     openwhiskCli:
       tag: "1.1.0"
     openwhiskCatalog:
-      gitTag: "1.0.0"
+      gitTag: "0.11.0"
     openwhiskPackageAlarms:
-      gitTag: "2.3.0"
+      gitTag: "2.2.0"
     openwhiskPackageKafka:
       gitTag: "2.1.0"
 
@@ -151,7 +152,7 @@ k8s:
 # Images used to run auxillary tasks/jobs
 utility:
   imageName: "openwhisk/ow-utils"
-  imageTag: "3e6138d"
+  imageTag: "1.0.0"
   imagePullPolicy: "IfNotPresent"
 
 # Docker registry
@@ -232,14 +233,13 @@ activationStoreBackend: "CouchDB"
 # Nginx configurations
 nginx:
   imageName: "nginx"
-  imageTag: "1.21.1"
+  imageTag: "1.19"
   imagePullPolicy: "IfNotPresent"
   replicaCount: 1
   restartPolicy: "Always"
   httpPort: 80
   httpsPort: 443
   httpsNodePort: 31001
-  workerProcesses: "auto"
   certificate:
     external: false
     cert_file: ""
@@ -249,7 +249,7 @@ nginx:
 # Controller configurations
 controller:
   imageName: "openwhisk/controller"
-  imageTag: "3e6138d"
+  imageTag: "1.0.0"
   imagePullPolicy: "IfNotPresent"
   replicaCount: 1
   restartPolicy: "Always"
@@ -262,10 +262,9 @@ controller:
 # Invoker configurations
 invoker:
   imageName: "openwhisk/invoker"
-  imageTag: "3e6138d"
+  imageTag: "1.0.0"
   imagePullPolicy: "IfNotPresent"
   restartPolicy: "Always"
-  runtimeDeleteTimeout: "30 seconds"
   port: 8080
   options: ""
   jvmHeapMB: "512"
@@ -317,7 +316,7 @@ redis:
 # User-events configuration
 user_events:
   imageName: "openwhisk/user-events"
-  imageTag: "3e6138d"
+  imageTag: "1.0.0"
   imagePullPolicy: "IfNotPresent"
   replicaCount: 1
   restartPolicy: "Always"
@@ -378,7 +377,7 @@ providers:
   alarm:
     enabled: true
     imageName: "openwhisk/alarmprovider"
-    imageTag: "2.3.0"
+    imageTag: "2.2.0"
     imagePullPolicy: "IfNotPresent"
     # NOTE: replicaCount > 1 doesn't work because of the PVC
     replicaCount: 1
@@ -431,8 +430,9 @@ toleration:
 # timeoutSeconds - Probe will timeouts after defined seconds, defaults to 1 second,
 #                  minimum value is 1
 # for more information please refer - https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
-# Note - for now added probes settings for zookeeper, kafka, and controller only.
-#        in future all components probes timing settings should be configured here.
+# Note - for now added probes settings for zookeeper and controller only.
+#        in future all components probes timing settings should be
+#        configured here if any.
 
 probes:
   zookeeper:
@@ -444,15 +444,6 @@ probes:
       initialDelaySeconds: 5
       periodSeconds: 10
       timeoutSeconds: 1
-  kafka:
-    livenessProbe:
-      initialDelaySeconds: 5
-      periodSeconds: 10
-      timeoutSeconds: 1
-    readinessProbe:
-      initialDelaySeconds: 5
-      periodSeconds: 10
-      timeoutSeconds: 5
   controller:
     livenessProbe:
       initialDelaySeconds: 10
@@ -673,6 +664,3 @@ elasticsearch:
   indexPattern: "openwhisk-%s"
   username: "admin"
   password: "admin"
-
-akka:
-  actorSystemTerminateTimeout: "30 s"

@@ -28,10 +28,6 @@ spec:
   selector:
     matchLabels:
       name: {{ .Release.Name }}-couchdb
-  {{- if .Values.k8s.persistence.enabled }}
-  strategy:
-    type: "Recreate"
-  {{- end }}
   template:
     metadata:
       labels:
