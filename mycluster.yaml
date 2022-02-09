@@ -263,7 +263,7 @@ controller:
 invoker:
   #imageName: "openwhisk/invoker"
   imageName: "alexmerenstein/f3-ow-invoker"
-  imageTag: "nodelete"
+  imageTag: "nodelete-0.0.1"
   imagePullPolicy: "IfNotPresent"
   restartPolicy: "Always"
   port: 8080
