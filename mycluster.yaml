@@ -81,7 +81,7 @@ whisk:
         std: "1m"
       memory:
         min: "128m"
-        max: "10000m"
+        max: "20000m"
         std: "256m"
       concurrency:
         min: 1
@@ -263,7 +263,7 @@ controller:
 invoker:
   #imageName: "openwhisk/invoker"
   imageName: "alexmerenstein/f3-ow-invoker"
-  imageTag: "nodelete-0.0.1"
+  imageTag: "nodelete-0.0.3"
   imagePullPolicy: "IfNotPresent"
   restartPolicy: "Always"
   port: 8080
